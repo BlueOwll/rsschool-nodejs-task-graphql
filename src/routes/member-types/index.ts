@@ -3,12 +3,16 @@ import { idParamSchema } from '../../utils/reusedSchemas';
 import { changeMemberTypeBodySchema } from './schema';
 import type { MemberTypeEntity } from '../../utils/DB/entities/DBMemberTypes';
 
+const memberTypeNotFoundErrorMessage = 'memberType not found';
+
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
   fastify.get('/', async function (request, reply): Promise<
     MemberTypeEntity[]
-  > {});
+  > {
+    return await this.db.memberTypes.findMany();
+  });
 
   fastify.get(
     '/:id',
@@ -17,7 +21,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<MemberTypeEntity> {}
+    async function (request, reply): Promise<MemberTypeEntity> {
+      const res = await this.db.memberTypes.findOne({key:'id',equals:request.params.id});
+      if (res === null) throw this.httpErrors.notFound(memberTypeNotFoundErrorMessage);
+      return res;
+    }
   );
 
   fastify.patch(
@@ -28,7 +36,13 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<MemberTypeEntity> {}
+    async function (request, reply): Promise<MemberTypeEntity> {
+      try {
+        return await this.db.memberTypes.change(request.params.id, request.body);
+      }catch (e){
+        throw this.httpErrors.badRequest(memberTypeNotFoundErrorMessage);
+      }    
+    }
   );
 };
 
