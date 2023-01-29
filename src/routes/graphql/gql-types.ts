@@ -7,7 +7,7 @@ import { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLList, GraphQLI
 //   email: string;
 //   subscribedToUserIds: string[];
 // };
-export const user = new GraphQLObjectType({
+export const userType = new GraphQLObjectType({
   name: 'user',
   fields: () => ({
     id: {
@@ -38,7 +38,7 @@ export const user = new GraphQLObjectType({
 //   memberTypeId: string;
 //   userId: string;
 // };
-export const profile = new GraphQLObjectType({
+export const profileType = new GraphQLObjectType({
   name: 'profile',
   fields: () => ({
     id: {
@@ -73,7 +73,7 @@ export const profile = new GraphQLObjectType({
 //   content: string;
 //   userId: string;
 // };
-export const post = new GraphQLObjectType({
+export const postType = new GraphQLObjectType({
   name: 'post',
   fields: () => ({
     id: {
@@ -95,7 +95,7 @@ export const post = new GraphQLObjectType({
 //   discount: number;
 //   monthPostsLimit: number;
 // };
-export const memberType = new GraphQLObjectType({
+export const memberTypeType = new GraphQLObjectType({
   name: 'memberType',
   fields: () => ({
     id: {

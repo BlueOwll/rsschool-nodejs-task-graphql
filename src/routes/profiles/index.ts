@@ -3,6 +3,7 @@ import { idParamSchema } from '../../utils/reusedSchemas';
 import { createProfileBodySchema, changeProfileBodySchema } from './schema';
 import type { ProfileEntity } from '../../utils/DB/entities/DBProfiles';
 import { invalidMemberTypeErrorMessage, profileExistsErrorMessage, profileNotFoundErrorMessage } from '../../utils/constants';
+import { getProfile } from './utils';
 
 
 
@@ -23,11 +24,8 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity> {
-      const res = await this.db.profiles.findOne({key:'id',equals:request.params.id});
-      if (res === null) throw this.httpErrors.notFound(profileNotFoundErrorMessage);
-        return res;
-      }
-    
+    return getProfile(this, request.params.id);
+    }
   );
 
   fastify.post(
