@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLList, GraphQLInt } from "graphql";
-import { getUserPosts, getUserProfile } from "../users/utils";
+import { getUserFollowers, getUserPosts, getUserProfile, getUserSubscription } from "../users/utils";
 
 // export type UserEntity = {
 //   id: string;
@@ -8,7 +8,7 @@ import { getUserPosts, getUserProfile } from "../users/utils";
 //   email: string;
 //   subscribedToUserIds: string[];
 // };
-export const userType = new GraphQLObjectType({
+export const userType: GraphQLObjectType = new GraphQLObjectType({
   name: 'user',
   fields: () => ({
     id: {
@@ -23,8 +23,9 @@ export const userType = new GraphQLObjectType({
     email: {
       type: GraphQLString,
     },
-    subscribedToUserIds: {
-      type: new GraphQLList(GraphQLString),
+    subscribedToUser: {
+      type: new GraphQLList(userType),
+      resolve: (user, args, context) => getUserFollowers(context, user),
     },
     posts: {
       type: new GraphQLList(postType),
@@ -33,6 +34,10 @@ export const userType = new GraphQLObjectType({
     profile: {
       type: profileType,
       resolve: (user, args, context) => getUserProfile(context, user),
+    },
+    userSubscribedTo: {
+      type: new GraphQLList(userType),
+      resolve: (user, args, context) => getUserSubscription(context, user),
     }
   }),
 });

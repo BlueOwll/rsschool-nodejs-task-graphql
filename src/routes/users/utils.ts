@@ -67,3 +67,15 @@ export const getUserMemberType = async (fastify: FastifyInstance, user: UserEnti
 
   return await getMemberType(fastify, profile.memberTypeId);
 }
+
+export const getUserSubscription = (fastify: FastifyInstance, user: UserEntity) => {
+  return fastify.db.users.findMany({
+    key: 'subscribedToUserIds',
+    inArray: user.id,
+  });
+}
+  
+  export const getUserFollowers = (fastify: FastifyInstance, user: UserEntity) => {
+    return user.subscribedToUserIds.map((id) => getUser(fastify, id))  
+  }
+

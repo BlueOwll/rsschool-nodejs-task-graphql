@@ -70,8 +70,9 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
+      const followerId = request.params.id;
       if (
-        !(await this.db.users.findOne({ key: 'id', equals: request.params.id }))
+        !(await this.db.users.findOne({ key: 'id', equals: followerId }))
       ) {
         throw this.httpErrors.badRequest(userNotFoundErrorMessage);
       }
@@ -84,10 +85,10 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         throw this.httpErrors.badRequest(userNotFoundErrorMessage);
 
       const { id, ...changeDTO } = parentUser;
-      if (changeDTO.subscribedToUserIds.includes(id)) {
+      if (changeDTO.subscribedToUserIds.includes(followerId)) {
         return parentUser;
       }
-      changeDTO.subscribedToUserIds.push(request.params.id);
+      changeDTO.subscribedToUserIds.push(followerId);
       return await this.db.users.change(id, changeDTO);
     }
   );
