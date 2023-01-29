@@ -1,4 +1,5 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLList, GraphQLInt } from "graphql";
+import { getUserPosts, getUserProfile } from "../users/utils";
 
 // export type UserEntity = {
 //   id: string;
@@ -25,6 +26,14 @@ export const userType = new GraphQLObjectType({
     subscribedToUserIds: {
       type: new GraphQLList(GraphQLString),
     },
+    posts: {
+      type: new GraphQLList(postType),
+      resolve: (user, args, context) => getUserPosts(context, user),
+    },
+    profile: {
+      type: profileType,
+      resolve: (user, args, context) => getUserProfile(context, user),
+    }
   }),
 });
 // export type ProfileEntity = {
@@ -109,3 +118,4 @@ export const memberTypeType = new GraphQLObjectType({
     },
   })
 });
+//resolver(source, args, context);

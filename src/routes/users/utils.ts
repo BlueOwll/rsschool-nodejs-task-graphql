@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { userNotFoundErrorMessage } from '../../utils/constants';
 import { UserEntity } from '../../utils/DB/entities/DBUsers';
+import { getMemberType } from '../member-types/utils';
 
 export const getUser = async (fastify: FastifyInstance, id: string) => {
   const res = await fastify.db.users.findOne({ key: 'id', equals: id });
@@ -45,3 +46,24 @@ export const deleteUser = async (fastify: FastifyInstance, id: string) => {
   }
   return result;
 };
+export const getUserPosts = async (fastify: FastifyInstance, user: UserEntity) => {
+  console.log(user);
+  return await fastify.db.posts.findMany({
+    key: 'userId',
+    equals: user.id,
+  });
+}
+
+export const getUserProfile = async (fastify: FastifyInstance, user: UserEntity) => {
+  return await fastify.db.profiles.findOne({
+    key: 'userId',
+    equals: user.id,
+  });
+}
+
+export const getUserMemberType = async (fastify: FastifyInstance, user: UserEntity) => {
+  const profile = await getUserProfile(fastify, user);
+  if (!profile) return null;
+
+  return await getMemberType(fastify, profile.memberTypeId);
+}

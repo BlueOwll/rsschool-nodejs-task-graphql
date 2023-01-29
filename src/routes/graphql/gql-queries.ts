@@ -5,6 +5,9 @@ import {
   GraphQLNonNull,
   GraphQLString,
 } from 'graphql';
+import { getMemberType } from '../member-types/utils';
+import { getPost } from '../posts/utils';
+import { getProfile } from '../profiles/utils';
 import { getUser } from '../users/utils';
 // import { getUser } from "../users/user_utils";
 import { userType, profileType, postType, memberTypeType } from './gql-types';
@@ -44,6 +47,33 @@ const rootQuery = new GraphQLObjectType({
         },
       },
       resolve: (_source, { id }, context) => getUser(context, id),
+    },
+    profile: {
+      type: profileType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+      },
+      resolve: (_source, { id }, context) => getProfile(context, id),
+    },
+    post: {
+      type: postType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+      },
+      resolve: (_source, { id }, context) => getPost(context, id),
+    },
+    memberType: {
+      type: memberTypeType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+      },
+      resolve: (_source, { id }, context) => getMemberType(context, id),
     },
   },
 });
