@@ -3,7 +3,7 @@ import { idParamSchema } from '../../utils/reusedSchemas';
 import { createProfileBodySchema, changeProfileBodySchema } from './schema';
 import type { ProfileEntity } from '../../utils/DB/entities/DBProfiles';
 import { profileNotFoundErrorMessage } from '../../utils/constants';
-import { createProfile, getProfile } from './utils';
+import { createProfile, getProfile, updateProfile } from './utils';
 
 
 
@@ -65,11 +65,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity> {
-      try {
-        return await this.db.profiles.change(request.params.id, request.body);
-      }catch (e){
-        throw this.httpErrors.badRequest(profileNotFoundErrorMessage);
-      }      
+        return updateProfile(this, request.params.id, request.body);
     }
   );
 };

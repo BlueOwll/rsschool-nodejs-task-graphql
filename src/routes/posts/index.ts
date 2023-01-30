@@ -3,7 +3,7 @@ import { idParamSchema } from '../../utils/reusedSchemas';
 import { createPostBodySchema, changePostBodySchema } from './schema';
 import type { PostEntity } from '../../utils/DB/entities/DBPosts';
 import { postNotFoundErrorMessage } from '../../utils/constants';
-import { createPost, getPost } from './utils';
+import { createPost, getPost, updatePost } from './utils';
 
 
 
@@ -64,11 +64,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<PostEntity> {
-      try {
-        return await this.db.posts.change(request.params.id, request.body);
-      }catch (e){
-        throw this.httpErrors.badRequest(postNotFoundErrorMessage);
-      }      
+      return updatePost(this, request.params.id, request.body);
 
     }
   );

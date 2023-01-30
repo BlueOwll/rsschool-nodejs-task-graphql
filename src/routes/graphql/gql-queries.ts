@@ -5,11 +5,11 @@ import {
   GraphQLNonNull,
   GraphQLString,
 } from 'graphql';
-import { getMemberType } from '../member-types/utils';
-import { createPost, getPost } from '../posts/utils';
-import { createProfile, getProfile } from '../profiles/utils';
-import { createUser, getUser } from '../users/utils';
-import { createPostDTOType, createProfileDTOType, createUserDTOType } from './gql-input-types';
+import { getMemberType, updateMemberType } from '../member-types/utils';
+import { createPost, getPost, updatePost } from '../posts/utils';
+import { createProfile, getProfile, updateProfile } from '../profiles/utils';
+import { createUser, getUser, subscribeTo, unsubscribeFrom, updateUser } from '../users/utils';
+import { changeMemberTypeDTOType, changePostDTOType, changeProfileDTOType, createPostDTOType, createProfileDTOType, createUserDTOType, updateUserDTOType } from './gql-input-types';
 import { userType, profileType, postType, memberTypeType } from './gql-types';
 
 const rootQuery = new GraphQLObjectType({
@@ -103,12 +103,84 @@ const rootMutation = new GraphQLObjectType({
       type: postType,
       args: {
         post: {
-          type: createPostDTOType,
+          type: new GraphQLNonNull(createPostDTOType),
         },
       },
       resolve: (_source, { post }, context) => createPost(context, post),
     },
-   
+    updateUser: {
+      type: userType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+        data: {
+          type: new GraphQLNonNull(updateUserDTOType),
+        }
+      },
+      resolve: (_source, { id, data }, context) => updateUser(context, id, data),
+    },
+    updateProfile: {
+      type: profileType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+        data: {
+          type: new GraphQLNonNull(changeProfileDTOType),
+        }
+      },
+      resolve: (_source, { id, data }, context) => updateProfile(context, id, data),
+    },
+    updatePost: {
+      type: postType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+        data: {
+          type: new GraphQLNonNull(changePostDTOType),
+        }
+      },
+      resolve: (_source, { id, data }, context) => updatePost(context, id, data),
+    },
+    updateMemberType: {
+      type: memberTypeType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+        data: {
+          type: new GraphQLNonNull(changeMemberTypeDTOType),
+        }
+      },
+      resolve: (_source, { id, data }, context) => updateMemberType(context, id, data),
+    },
+    subscribeTo: {
+      type: userType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+        userId: {
+          type: new GraphQLNonNull(GraphQLString),
+        }
+      },
+      resolve: (_source, { id, userId }, context) => subscribeTo(context, id, userId),
+    },
+    unsubscribeFrom: {
+      type: userType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLString),
+        },
+        userId: {
+          type: new GraphQLNonNull(GraphQLString),
+        }
+      },
+      resolve: (_source, { id, userId }, context) => unsubscribeFrom(context, id, userId),
+    },
+
   },
 });
 export const rootSchema = new GraphQLSchema({ query: rootQuery, mutation: rootMutation });
