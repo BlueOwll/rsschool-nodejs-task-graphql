@@ -3,7 +3,7 @@ import {
   postNotFoundErrorMessage,
   userNotFoundErrorMessage,
 } from '../../utils/constants';
-import { CreatePostDTO } from '../../utils/DB/entities/DBPosts';
+import { ChangePostDTO, CreatePostDTO } from '../../utils/DB/entities/DBPosts';
 
 export const getPost = async (fastify: FastifyInstance, id: string) => {
   const res = await fastify.db.posts.findOne({ key: 'id', equals: id });
@@ -20,3 +20,11 @@ export const createPost = async (
   }
   return await fastify.db.posts.create(post);
 };
+
+export const updatePost = async (fastify: FastifyInstance, id: string, data: ChangePostDTO) => {
+  try {
+    return await fastify.db.posts.change(id, data);
+  }catch (e){
+    throw fastify.httpErrors.badRequest(postNotFoundErrorMessage);
+  }    
+}

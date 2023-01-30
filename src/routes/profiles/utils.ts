@@ -5,7 +5,7 @@ import {
   profileExistsErrorMessage,
   profileNotFoundErrorMessage,
 } from '../../utils/constants';
-import { CreateProfileDTO } from '../../utils/DB/entities/DBProfiles';
+import { ChangeProfileDTO, CreateProfileDTO } from '../../utils/DB/entities/DBProfiles';
 
 export const getProfile = async (fastify: FastifyInstance, id: string) => {
   const res = await fastify.db.profiles.findOne({ key: 'id', equals: id });
@@ -38,3 +38,11 @@ export const createProfile = async (
   }
   return fastify.db.profiles.create(profile);
 };
+
+export const updateProfile = async (fastify: FastifyInstance, id: string, data: ChangeProfileDTO) => {
+  try {
+    return await fastify.db.profiles.change(id, data);
+  }catch (e){
+    throw fastify.httpErrors.badRequest(profileNotFoundErrorMessage);
+  }  
+}

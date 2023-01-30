@@ -6,11 +6,7 @@ import {
   subscribeBodySchema,
 } from './schemas';
 import type { UserEntity } from '../../utils/DB/entities/DBUsers';
-import {
-  noSuchSubscriptionErrorMessage,
-  userNotFoundErrorMessage,
-} from '../../utils/constants';
-import { createUser, deleteUser, getUser } from './utils';
+import { createUser, deleteUser, getUser, subscribeTo, unsubscribeFrom, updateUser } from './utils';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -71,26 +67,8 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
-      const followerId = request.params.id;
-      if (
-        !(await this.db.users.findOne({ key: 'id', equals: followerId }))
-      ) {
-        throw this.httpErrors.badRequest(userNotFoundErrorMessage);
-      }
-
-      const parentUser = await this.db.users.findOne({
-        key: 'id',
-        equals: request.body.userId,
-      });
-      if (!parentUser)
-        throw this.httpErrors.badRequest(userNotFoundErrorMessage);
-
-      const { id, ...changeDTO } = parentUser;
-      if (changeDTO.subscribedToUserIds.includes(followerId)) {
-        return parentUser;
-      }
-      changeDTO.subscribedToUserIds.push(followerId);
-      return await this.db.users.change(id, changeDTO);
+      return subscribeTo(this, request.params.id, request.body.userId);
+ 
     }
   );
 
@@ -103,29 +81,8 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
-      const userId = request.params.id;
-      if (!(await this.db.users.findOne({ key: 'id', equals: userId }))) {
-        throw this.httpErrors.badRequest(userNotFoundErrorMessage);
-      }
-
-      const parentId = request.body.userId;
-      const parentUser = await this.db.users.findOne({
-        key: 'id',
-        equals: parentId,
-      });
-      if (!parentUser)
-        throw this.httpErrors.badRequest(userNotFoundErrorMessage);
-
-      const { id, ...changeDTO } = parentUser;
-      if (!changeDTO.subscribedToUserIds.includes(userId)) {
-        throw this.httpErrors.badRequest(noSuchSubscriptionErrorMessage);
-      }
-
-      return await this.db.users.change(parentId, {
-        subscribedToUserIds: changeDTO.subscribedToUserIds.filter(
-          (item) => item !== userId
-        ),
-      });
+      return unsubscribeFrom(this, request.params.id, request.body.userId);
+   
     }
   );
 
@@ -138,11 +95,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
-      try {
-        return await this.db.users.change(request.params.id, request.body);
-      } catch (e) {
-        throw this.httpErrors.badRequest(userNotFoundErrorMessage);
-      }
+      return updateUser(this, request.params.id, request.body);
     }
   );
 };

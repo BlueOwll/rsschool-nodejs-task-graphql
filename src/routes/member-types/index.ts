@@ -2,8 +2,7 @@ import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-sc
 import { idParamSchema } from '../../utils/reusedSchemas';
 import { changeMemberTypeBodySchema } from './schema';
 import type { MemberTypeEntity } from '../../utils/DB/entities/DBMemberTypes';
-import { memberTypeNotFoundErrorMessage } from '../../utils/constants';
-import { getMemberType } from './utils';
+import { getMemberType, updateMemberType } from './utils';
 
 
 
@@ -37,11 +36,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<MemberTypeEntity> {
-      try {
-        return await this.db.memberTypes.change(request.params.id, request.body);
-      }catch (e){
-        throw this.httpErrors.badRequest(memberTypeNotFoundErrorMessage);
-      }    
+      return updateMemberType(this, request.params.id, request.body);
     }
   );
 };
