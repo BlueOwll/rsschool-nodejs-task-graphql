@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { userNotFoundErrorMessage } from '../../utils/constants';
-import { UserEntity } from '../../utils/DB/entities/DBUsers';
+import { UserEntity, CreateUserDTO } from '../../utils/DB/entities/DBUsers';
 import { getMemberType } from '../member-types/utils';
 
 export const getUser = async (fastify: FastifyInstance, id: string) => {
@@ -77,5 +77,9 @@ export const getUserSubscription = (fastify: FastifyInstance, user: UserEntity) 
   
   export const getUserFollowers = (fastify: FastifyInstance, user: UserEntity) => {
     return user.subscribedToUserIds.map((id) => getUser(fastify, id))  
+  }
+
+  export const createUser = (fastify: FastifyInstance, user: CreateUserDTO) => {
+    return fastify.db.users.create(user);
   }
 

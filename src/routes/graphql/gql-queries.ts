@@ -6,10 +6,10 @@ import {
   GraphQLString,
 } from 'graphql';
 import { getMemberType } from '../member-types/utils';
-import { getPost } from '../posts/utils';
-import { getProfile } from '../profiles/utils';
-import { getUser } from '../users/utils';
-// import { getUser } from "../users/user_utils";
+import { createPost, getPost } from '../posts/utils';
+import { createProfile, getProfile } from '../profiles/utils';
+import { createUser, getUser } from '../users/utils';
+import { createPostDTOType, createProfileDTOType, createUserDTOType } from './gql-input-types';
 import { userType, profileType, postType, memberTypeType } from './gql-types';
 
 const rootQuery = new GraphQLObjectType({
@@ -77,4 +77,38 @@ const rootQuery = new GraphQLObjectType({
     },
   },
 });
-export const rootSchema = new GraphQLSchema({ query: rootQuery });
+const rootMutation = new GraphQLObjectType({
+  name: 'mutation',
+  fields: {
+    createUser: {
+      type: userType,
+      args: {
+        user: {
+          type: createUserDTOType,
+        },
+      },
+      resolve: (_source, { user }, context) => createUser(context, user),
+    },
+  
+    createProfile: {
+      type: profileType,
+      args: {
+        profile: {
+          type: createProfileDTOType,
+        },
+      },
+      resolve: (_source, { profile }, context) => createProfile(context, profile),
+    },
+    createPost: {
+      type: postType,
+      args: {
+        post: {
+          type: createPostDTOType,
+        },
+      },
+      resolve: (_source, { post }, context) => createPost(context, post),
+    },
+   
+  },
+});
+export const rootSchema = new GraphQLSchema({ query: rootQuery, mutation: rootMutation });

@@ -10,7 +10,7 @@ import {
   noSuchSubscriptionErrorMessage,
   userNotFoundErrorMessage,
 } from '../../utils/constants';
-import { deleteUser, getUser } from './utils';
+import { createUser, deleteUser, getUser } from './utils';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -44,7 +44,8 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
-      return await this.db.users.create(request.body);
+      return createUser(this, request.body);
+     
     }
   );
 

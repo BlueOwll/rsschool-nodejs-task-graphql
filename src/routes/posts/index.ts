@@ -2,8 +2,8 @@ import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-sc
 import { idParamSchema } from '../../utils/reusedSchemas';
 import { createPostBodySchema, changePostBodySchema } from './schema';
 import type { PostEntity } from '../../utils/DB/entities/DBPosts';
-import { postNotFoundErrorMessage, userNotFoundErrorMessage } from '../../utils/constants';
-import { getPost } from './utils';
+import { postNotFoundErrorMessage } from '../../utils/constants';
+import { createPost, getPost } from './utils';
 
 
 
@@ -35,10 +35,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<PostEntity> {
-      if (!(await this.db.users.findOne({key:'id',equals:request.body.userId}))){
-        throw this.httpErrors.badRequest(userNotFoundErrorMessage);
-      }
-      return await this.db.posts.create(request.body);
+      return createPost(this, request.body);
     }
   );
 

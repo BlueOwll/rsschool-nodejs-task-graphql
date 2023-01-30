@@ -2,8 +2,8 @@ import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-sc
 import { idParamSchema } from '../../utils/reusedSchemas';
 import { createProfileBodySchema, changeProfileBodySchema } from './schema';
 import type { ProfileEntity } from '../../utils/DB/entities/DBProfiles';
-import { invalidMemberTypeErrorMessage, profileExistsErrorMessage, profileNotFoundErrorMessage } from '../../utils/constants';
-import { getProfile } from './utils';
+import { profileNotFoundErrorMessage } from '../../utils/constants';
+import { createProfile, getProfile } from './utils';
 
 
 
@@ -36,13 +36,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity> {
-      if((await this.db.profiles.findMany({key: 'userId', equals: request.body.userId})).length) {
-        throw this.httpErrors.badRequest(profileExistsErrorMessage);
-      }
-      if(!(await this.db.memberTypes.findOne({key: 'id', equals: request.body.memberTypeId}))) {
-        throw this.httpErrors.badRequest(invalidMemberTypeErrorMessage);
-      }
-      return await this.db.profiles.create(request.body);
+      return createProfile(this, request.body)
     }
   );
 
